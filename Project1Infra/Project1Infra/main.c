@@ -94,7 +94,8 @@ int main(int argc, char* argv[]) {
 		for (i = 0; i < l; i++) {
 			msg[i] = 0;
 		}
-
+		
+		
 		leerMensaje(img, msg, l, n);
 
 		msg[l] = 0;
@@ -118,58 +119,58 @@ int main(int argc, char* argv[]) {
 */
 void insertarMensaje(Imagen * img, unsigned char mensaje[], int n) {
 
-	int ancho = img->ancho;
-	int alto = img->alto;
-	int numBytesAncho = ancho * 3;
-	int numBytesAlto = alto * 3;
-	int desp = 8 - n;
-	int avance = 0;
-	int bytesCount = 0;
-	int groupsCount = 0;
+//	int ancho = img->ancho;
+//	int alto = img->alto;
+//	int numBytesAncho = ancho * 3;
+//	int numBytesAlto = alto * 3;
+//	int desp = 8 - n;
+//	int avance = 0;
+//	int bytesCount = 0;
+//	int groupsCount = 0;
 
-	for (int y = 0; y < numBytesAlto; y++) {
-		for (int x = 0; x < numBytesAncho; x++) {
-			int pos = y * ancho + x;
-			if ((n*groupsCount) % 8 == 0) {
-				img->informacion[pos] >> desp;
-				img->informacion[pos] << desp;
-				unsigned char temp = sacarNbits(mensaje, bytesCount, n);
-				img->informacion[pos] = img->informacion[pos] + temp;
-				groupsCount++;
+//	for (int y = 0; y < numBytesAlto; y++) {
+//		for (int x = 0; x < numBytesAncho; x++) {
+//			int pos = y * ancho + x;
+//			if ((n*groupsCount) % 8 == 0) {
+//				img->informacion[pos] >> desp;
+//				img->informacion[pos] << desp;
+//				unsigned char temp = sacarNbits(mensaje, bytesCount, n);
+//				img->informacion[pos] = img->informacion[pos] + temp;
+//				groupsCount++;
 
-			}
-			else if (bytesCount * 8 < groupsCount*n && (bytesCount + 1) * 8 > (groupsCount + 1)*n) {
+		//	}
+	//		else if (bytesCount * 8 < groupsCount*n && (bytesCount + 1) * 8 > (groupsCount + 1)*n) {
 
-				img->informacion[pos] >> desp;
-				img->informacion[pos] << desp;
-				int  izq = (groupsCount*n) - (bytesCount * 8);
-				unsigned char temp = mensaje[bytesCount] << izq;
-				temp = temp >> ((bytesCount + 1) * 8 > -(groupsCount + 1)*n) + izq;
-				img->informacion[pos] = img->informacion[pos] + mensaje[bytesCount];
-				groupsCount++;
-
-
-			}
-			else if (bytesCount * 8 < groupsCount*n && (bytesCount + 1) * 8 < (groupsCount + 1)*n) {
-
-				img->informacion[pos] >> desp;
-				img->informacion[pos] << desp;
-				int  izq = ((bytesCount*n) - (groupsCount * 8));
-				unsigned char temp = mensaje[bytesCount] << 8 - izq;
-				temp = temp >> n - izq;
-				unsigned char temp2 = mensaje[bytesCount++] >> 8 - (n - izq);
-				unsigned char res = temp + temp2;
-				img->informacion[pos] = img->informacion[pos] + res;
-				groupsCount++;
-				bytesCount++;
+//				img->informacion[pos] >> desp;
+//				img->informacion[pos] << desp;
+//				int  izq = (groupsCount*n) - (bytesCount * 8);
+//				unsigned char temp = mensaje[bytesCount] << izq;
+//				temp = temp >> ((bytesCount + 1) * 8 > -(groupsCount + 1)*n) + izq;
+//				img->informacion[pos] = img->informacion[pos] + mensaje[bytesCount];
+//				groupsCount++;
 
 
-			}
+//			}
+//			else if (bytesCount * 8 < groupsCount*n && (bytesCount + 1) * 8 < (groupsCount + 1)*n) {
+
+//				img->informacion[pos] >> desp;
+//				img->informacion[pos] << desp;
+//				int  izq = ((bytesCount*n) - (groupsCount * 8));
+//				unsigned char temp = mensaje[bytesCount] << 8 - izq;
+//				temp = temp >> n - izq;
+//				unsigned char temp2 = mensaje[bytesCount++] >> 8 - (n - izq);
+//				unsigned char res = temp + temp2;
+//				img->informacion[pos] = img->informacion[pos] + res;
+//				groupsCount++;
+//				bytesCount++;
 
 
-		}
+	//		}
+
+
+	//	}
 		// TODO: Desarrollar OBLIGATORIAMENTE en su totalidad.
-	}
+	//}
 }
 /**
 * Extrae un mensaje de tamanio l, guardado de a n bits por componente de color, de la imagen apuntada por img
@@ -179,21 +180,65 @@ void insertarMensaje(Imagen * img, unsigned char mensaje[], int n) {
 * parámetro n: Cantidad de bits del mensaje que se almacenan en cada componente de color de cada pixel. 0 < n <= 8.
 */
 void leerMensaje(Imagen * img, unsigned char msg[], int l, int n) {
+	int primeraVez = 1;		//variable de referencia para el primer caso (es decir, cuando se empieza a sacar los primeros n bits de todo el arreglo de información
+	int pos = 0;	//Contador de posiciones del arreglo informacion de img
+	int totbits = 0;	//contador de cuántos bits se tienen de una letra
+	int vtb = 0;	//Contador de cuántas letras se han leído y a la par, es el índice donde se guardará la letra completa en msg
+	int faltan = 0;	//Contador de cuántos bits faltan
+	unsigned char temp1;	//Variable donde se guardan los primeros n bits de la letra en las posiciones más significativas del char
+	unsigned char tempAux;	//Variable que guardan los siguientes n bits de la letra
+	unsigned char tempFalta;	//Variable que guarda los ultimos bits necesarios para completar la letra
+	unsigned char tempResiduo;	//Variable que guarda los bits restantes (son menos que n) de cada unsigned char de informacion
+	unsigned char letra;	//Char completo a guardar en msg
+	unsigned char temp1Def;	//Variable para guardar temp1 con el corrimiento necesario aplicado
+	unsigned char tempAuxDef;	//variable para guardar tempAux con el corrimiento necesario aplicado
+	unsigned char tempResiduoDef;	//Variable para guardar tempResiduo con el corriemiento necesario aplicado
 
-	int ancho = img->ancho;
-	int alto = img->alto;
-	int numBytesAncho = ancho * 3;
-	int numBytesAlto = alto * 3;
-	int contBytes = 0;
-	int count = 0;
-	for (int y = 0; y < numBytesAlto && contBytes < l; y++) {
-		for (int x = 0; x < numBytesAncho && contBytes < l; x++) {
-			int pos = y * ancho + x;
-
+	   
+	while(vtb < l){	//Recorrer hasta que se complete la longitud del mensaje
+		if (primeraVez == 1) {	//Caso inicial, de primera vez que se empieza la lectura de los unsigned char guardados en informacion
+			
+			//printf("secuencia seria: %s ", &img->informacion[pos]);
+			temp1 = sacarNbits(&img->informacion[pos], 8 - n, n);	//Asignación de temp1
+			temp1Def = temp1 << (8 - n); //Corrimiento de temp1 para guardar los bits extraídos en las posiciones más significativas
+			totbits = n; //Aumento el total de bits que se tienen en la letra
+			faltan = 8 - totbits;	//Calculo cuántos bits faltan para completar la letra
+			primeraVez++; //Sumo primeravez para no volver a entrar en este if
+			
 		}
-
-		// TODO: Desarrollar OBLIGATORIAMENTE en su totalidad.
+	
+		else { //Caso cuando no es la primera vez que se lee la imagen en busca del mensaje
+			
+			if (faltan > n) {	//Caso cuando en la letra que se esta formando aun hay espacios para n bits más
+				
+				tempAux = sacarNbits(&img->informacion[pos], 8 - n, n);	//generar tempAux, desde los 8-n bits del unsigned char de informacion, guardando otros n bits
+				totbits += n;	//Sumo n a totBits para saber que hay totBits en la letra
+				faltan = 8 - totbits; //Calcula cuantos bits faltan para completar la palabra
+				tempAuxDef = tempAux << faltan;	//Correr tempAux la cantidad necesaria para juntar estos bits con los de temp1Def
+				temp1Def = temp1Def | tempAuxDef;	//Juntar bits de temp1Def con tempAuxDef con operador OR y dejar en cero la cantidad "faltan" de bits
+			}
+			else {	//Caso cuando en la letra que se está formando no caben n bits más
+				
+				tempFalta = sacarNbits(&img->informacion[pos], 8 - n, faltan);	//Asignar tempFalta con bits extraídos desde 8-n, tomando los que hagan falta (variable faltan) para completar la palabra
+				tempResiduo = sacarNbits(&img->informacion[pos], 8 - (n - faltan), n - faltan); //En vista de que en el unsigned char de informacion aun queda cierta cantidad de bits del total de n bits, se toman los bit restantes y se asignan a esta variable a modo de residuo
+				tempResiduoDef = tempResiduo << (8 - (n - faltan));	//Desplazo tempResiduo a la izquierda para dejar sus bits en la posición más significativa de un nuevo char que se usa más adelante
+				totbits += faltan; //Se suman faltan a total de bits
+				if (totbits == 8) {	//Si totBits es 8, es decir que ya se tiene lo necesario para formar una letra, se hace lo siguiente
+					letra = temp1Def | tempFalta; //Se crea la letra con operando OR entre temp1Def y tempFalta
+					msg[vtb] = letra; //Se guarda la letra creada en msg en posición vtb
+					vtb++; //Se suma 1 a vtb indicando que ya se tiene una letra del mensaje y que la siguiente letra se guarda en la siguiente posicion de msg
+					totbits = n - faltan;	//Ahora total de bits es n - faltan, lo que resulta en la cantidad de bits que se tienen guardados en tempResiduoDef (esto porque lo que hay en tempResiduoDef es el comienzo de la siguiente letra)
+					faltan = 8 - totbits;	//Faltan 8-totalBits que tengo en tempReiduoDef
+					temp1Def = tempResiduoDef;	//Antes de la siguiente iteración, se pasa lo que está en tempResiduoDef a temp1Def, ya que temp1Def es el comienzo de la siguiente letra
+				}
+			}
+		}
+		pos++; //Avanzar de posición en arreglo de informacion de la imagen
+		
 	}
+	
+	// TODO: Desarrollar OBLIGATORIAMENTE en su totalidad.
+
 }
 /**
 * Extrae n bits a partir del bit que se encuentra en la posición bitpos en la secuencia de bytes que
