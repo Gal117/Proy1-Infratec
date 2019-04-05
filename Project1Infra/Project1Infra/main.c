@@ -119,58 +119,27 @@ int main(int argc, char* argv[]) {
 */
 void insertarMensaje(Imagen * img, unsigned char mensaje[], int n) {
 
-//	int ancho = img->ancho;
-//	int alto = img->alto;
-//	int numBytesAncho = ancho * 3;
-//	int numBytesAlto = alto * 3;
-//	int desp = 8 - n;
-//	int avance = 0;
-//	int bytesCount = 0;
-//	int groupsCount = 0;
+	int ancho = img->ancho;
+	int alto = img->alto;
+	int numBytesAncho = ancho * 3;
+	int numBytesAlto = alto * 3;
+	int desp = 8 - n;
+	int avance = 0;
+	int bytesCount = 0;
+	int groupsCount = 0;
+	int k = 0;
+	for(int i = 0; i < (alto*ancho); i++)
+	{
+		imagen->informacion[i] = (imagen->informacion[i] >> n)<<n;
+		for(int j = 0; j < n; j++, k++)
+		{
+			if((mensaje[k] & (1<<(K%8))) != 0)
+			{
+				imagen->informacion[i] = ( 1<<(8 - n -j) | imagen->informacion[i] );
+			}
+		}
+	}
 
-//	for (int y = 0; y < numBytesAlto; y++) {
-//		for (int x = 0; x < numBytesAncho; x++) {
-//			int pos = y * ancho + x;
-//			if ((n*groupsCount) % 8 == 0) {
-//				img->informacion[pos] >> desp;
-//				img->informacion[pos] << desp;
-//				unsigned char temp = sacarNbits(mensaje, bytesCount, n);
-//				img->informacion[pos] = img->informacion[pos] + temp;
-//				groupsCount++;
-
-		//	}
-	//		else if (bytesCount * 8 < groupsCount*n && (bytesCount + 1) * 8 > (groupsCount + 1)*n) {
-
-//				img->informacion[pos] >> desp;
-//				img->informacion[pos] << desp;
-//				int  izq = (groupsCount*n) - (bytesCount * 8);
-//				unsigned char temp = mensaje[bytesCount] << izq;
-//				temp = temp >> ((bytesCount + 1) * 8 > -(groupsCount + 1)*n) + izq;
-//				img->informacion[pos] = img->informacion[pos] + mensaje[bytesCount];
-//				groupsCount++;
-
-
-//			}
-//			else if (bytesCount * 8 < groupsCount*n && (bytesCount + 1) * 8 < (groupsCount + 1)*n) {
-
-//				img->informacion[pos] >> desp;
-//				img->informacion[pos] << desp;
-//				int  izq = ((bytesCount*n) - (groupsCount * 8));
-//				unsigned char temp = mensaje[bytesCount] << 8 - izq;
-//				temp = temp >> n - izq;
-//				unsigned char temp2 = mensaje[bytesCount++] >> 8 - (n - izq);
-//				unsigned char res = temp + temp2;
-//				img->informacion[pos] = img->informacion[pos] + res;
-//				groupsCount++;
-//				bytesCount++;
-
-
-	//		}
-
-
-	//	}
-		// TODO: Desarrollar OBLIGATORIAMENTE en su totalidad.
-	//}
 }
 /**
 * Extrae un mensaje de tamanio l, guardado de a n bits por componente de color, de la imagen apuntada por img
