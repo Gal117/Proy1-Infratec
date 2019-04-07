@@ -129,8 +129,19 @@ void insertarMensaje(Imagen * img, unsigned char mensaje[], int n) {
 	int groupsCount = 0;
 	int k = 7;
 	int count = 0;
-	for(int i = 0; i < (alto*ancho); i++)
+	int temp = 0;
+	int length = 0;
+	while (mensaje[length] != '\0')
 	{
+		length++;
+	}
+
+	for(int i = 0; i < numBytesAlto*numBytesAncho; i++)
+	{
+		if (count >= length)
+		{
+			break;
+		}
 		img->informacion[i] = (img->informacion[i] >> n)<<n;
 		for(int j = 0; j < n; j++, k--)
 		{
