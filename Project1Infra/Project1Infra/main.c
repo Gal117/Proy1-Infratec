@@ -119,40 +119,35 @@ int main(int argc, char* argv[]) {
 */
 void insertarMensaje(Imagen * img, unsigned char mensaje[], int n) {
 
-	int ancho = img->ancho;
-	int alto = img->alto;
-	int numBytesAncho = ancho * 3;
-	int numBytesAlto = alto * 3;
-	int desp = 8 - n;
-	int avance = 0;
-	int bytesCount = 0;
-	int groupsCount = 0;
-	int k = 7;
-	int count = 0;
-	int temp = 0;
-	int length = 0;
-	while (mensaje[length] != '\0')
+	int ancho = img->ancho; //Ancho en pixeles de la imagen
+	int alto = img->alto; //Alto en pixeles de la imagen
+	int numBytesAncho = ancho * 3; //Ancho en bytes de la imagen(pixel = RGB)
+	int numBytesAlto = alto * 3; //Ancho en bytes de la imagen(pixel = RGB)
+	int k = 7; //Posicion del bit en cada byte del mensaje (Es 7 porque se usara modulo para determinar tal posición)
+	int count = 0; //Byte actual del mensaje 
+	int length = 0; //Longitud del mensaje
+	while (mensaje[length] != '\0') //Se recorre el mensaje hasta que se acabe para determinar su longitud.
 	{
 		length++;
 	}
 
-	for(int i = 0; i < numBytesAlto*numBytesAncho; i++)
+	for(int i = 0; i < numBytesAlto*numBytesAncho; i++) //Byte actual de la imagen.
 	{
-		if (count >= length)
+		if (count >= length) //Si el byte actual del mensaje supera o es igual a su longitud, se acaba el ciclo, para evitar excepciones.
 		{
 			break;
 		}
-		img->informacion[i] = (img->informacion[i] >> n)<<n;
-		for(int j = 0; j < n; j++, k--)
+		img->informacion[i] = (img->informacion[i] >> n)<<n; //Se eliminan los bits menos significativos mediante corrimientos.
+		for(int j = 0; j < n; j++, k--) //Aqui se controla de a cuanto se agrupan los bits del mensaje dependiendo de n.
 		{
-			if (k < 0)
+			if (k < 0) //Si la posicion del bit en el byte del mensaje es menor a 0, k vuelve a 7 y se cambia de byte en el mensaje, porque ya se inserto todo el byte.
 			{
 				k = 7;
 				count++;
 			}
-			if((mensaje[count] & (1<<(k%8))) != 0)
+			if((mensaje[count] & (1<<(k%8))) != 0) //Se determina si el bit actual del mensaje es un 1 con AND. Si lo es, inserta el 1 en el byte de la imagen con un OR. Si no lo es, cambia de bit.
 			{
-				img->informacion[i] = (img->informacion[i] | 1 << (n - j -1));
+				img->informacion[i] = (img->informacion[i] | 1 << (n - j -1)); //n-j-1 determina que tanto se debe correr el 1 para ser insertado en el byte de la imagen, pues j me dice en que bit del grupo de tamanio n voy.
 			}
 		}
 	}
