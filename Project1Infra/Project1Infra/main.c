@@ -127,15 +127,21 @@ void insertarMensaje(Imagen * img, unsigned char mensaje[], int n) {
 	int avance = 0;
 	int bytesCount = 0;
 	int groupsCount = 0;
-	int k = 0;
+	int k = 7;
+	int count = 0;
 	for(int i = 0; i < (alto*ancho); i++)
 	{
-		imagen->informacion[i] = (imagen->informacion[i] >> n)<<n;
-		for(int j = 0; j < n; j++, k++)
+		img->informacion[i] = (img->informacion[i] >> n)<<n;
+		for(int j = 0; j < n; j++, k--)
 		{
-			if((mensaje[k] & (1<<(K%8))) != 0)
+			if (k < 0)
 			{
-				imagen->informacion[i] = ( 1<<(8 - n -j) | imagen->informacion[i] );
+				k = 7;
+				count++;
+			}
+			if((mensaje[count] & (1<<(k%8))) != 0)
+			{
+				img->informacion[i] = (img->informacion[i] | 1 << (n - j -1));
 			}
 		}
 	}
